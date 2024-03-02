@@ -395,9 +395,17 @@ static void quot_rem(const Polynomial<K>& A,
         BB.set(BB.deg(), K(0));
 
         AA -= BB;
-        Q.set(k, a_lead/b_lead);
+        Q.set(k, q);
     }
     R = A - Q*B;
+    for (long k = B.deg(); k <= R.deg(); k++) {
+        R.set(k, K(0));
+    }
+    if (R.deg() >= B.deg()) {
+        std::cout << R << " " << B << std::endl;
+        std::cerr << "Warning: Degree of remainder is at least degree of divisor. " 
+            << "Result is erroneous" << std::endl;
+    }
 }
 
 // Returns gcd (monic) of two polynomials
@@ -409,9 +417,15 @@ Polynomial<K> gcd(const Polynomial<K>& A, const Polynomial<K>& B) {
         AA.make_monic();
         return AA;
     }
+    if (A.isZero()) {
+        if (B.is_monic()) return B;
+        Polynomial<K> BB(B);
+        BB.make_monic();
+        return BB;
+    }
 
     Polynomial<K> C;
-    C = A%B;
+    C = A % B;
     return gcd(B, C);
 }
 

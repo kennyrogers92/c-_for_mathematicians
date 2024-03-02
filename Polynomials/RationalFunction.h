@@ -74,9 +74,7 @@ class RationalFunction {
             Q = Polynomial<K>(denominator);
             R = Polynomial<K>(that.numerator);
             S = Polynomial<K>(that.denominator);
-            RationalFunction<K> ans;
-            ans = RationalFunction<K>(P*S + R*Q, Q*S);
-            return ans;
+            return RationalFunction<K>((P*S)+(Q*R), Q*S);
         }
 
         RationalFunction<K> operator+=(const RationalFunction<K> that) {
@@ -120,7 +118,6 @@ class RationalFunction {
             Polynomial<K> temp = numerator;
             ans.setNum(denominator);
             ans.setDenom(temp);
-            ans.simplify();
             return ans;
         }
 
@@ -140,8 +137,13 @@ class RationalFunction {
         // Returns the derivative of this rational function
         RationalFunction<K> derivative() const {
             RationalFunction<K> ans;
-            ans.setNum(denominator*numerator.derivative() - numerator*denominator.derivative());
-            ans.setDenom(denominator.pow(2));
+            Polynomial<K> P, Q, Px, Qx;
+            P = numerator;
+            Q = denominator;
+            Px = P.derivative();
+            Qx = Q.derivative();
+            ans.setNum(Q*Px - P*Qx);
+            ans.setDenom(Q.pow(2));
             ans.simplify();
             return ans;
         }

@@ -66,5 +66,10 @@ int main() {
     std::cout << "U(X) = " << U << std::endl;
     std::cout << "V(X) = " << V << std::endl;
 
-    std::cout << "(U - V)(X) = " << U + V << std::endl;
+    std::cout << "(U + V)(X) = " << U + V << std::endl;
+    std::cout << "(U - V)(X) = " << U - V << std::endl;
+    std::cout << "(U * V)(X) = " << U * V << std::endl;
+    std::cout << "(U / V)(X) = " << U / V << std::endl;
+    std::cout << "U^2 = " << U.pow(2) << std::endl;
+    std::cout << "Dx(U(X)) = " << U.derivative() << std::endl;
 }
