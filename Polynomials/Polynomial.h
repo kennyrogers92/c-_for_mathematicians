@@ -32,7 +32,7 @@ class Polynomial {
     public:
         // CONSTRUCTORS 
         // Default constructor: zero polynomial
-        Polynomial<K> () {
+        Polynomial<K>() {
             clear();
         }
 
@@ -100,7 +100,7 @@ class Polynomial {
             deg_check();
         }
 
-        // Set all coefficients to zero
+        // Reset to zero polynomial: coefficient of constant term is zero and degree is -1
         void clear() {
             coef.resize(1);
             dg = -1;
@@ -294,7 +294,7 @@ class Polynomial {
         // Returns the derivative of this polynomial
         Polynomial<K> derivative() const {
             Polynomial<K> ans;
-            for (long k = 1; k <= n; k++) {
+            for (long k = 1; k <= dg; k++) {
                 ans.set(k-1, k*get(k));
             }
             return ans;
@@ -303,9 +303,10 @@ class Polynomial {
         // Returns the integral of this polynomial
         Polynomial<K> integral() const {
             Polynomial<K> ans;
-            for (long k = 0; k <= n; k++) {
+            for (long k = 0; k <= dg; k++) {
                 ans.set(k+1, K(1)/K(k+1)*get(k));
             }
+            return ans;
         }
 
 };      // end of Polynomial<K> class template
@@ -313,20 +314,36 @@ class Polynomial {
 template <class K>
 std::ostream& operator<<(std::ostream& os, const Polynomial<K>& P) {
     if (P.deg() <= 0) {
-        os << "(" << P[0] << ")";
+        os << P[0];
         return os;
     }
-    for (long k = P.deg(); k >= 0; k--) {
-        if (P[k] != K(0)) {
-            if (k < P.deg()) os << " + ";
-            os << "(" << P[k] << ")";
-            if (k > 1) {
-                os << "X^" << k;
-                continue;
+    for (long k = P.deg(); k > -1; k--) {
+        K coeff = P[k];
+        if (coeff == K(0)) {
+            continue;
+        }
+        if (coeff < K(0)) {
+            coeff *= K(-1);
+            if (k == P.deg()) {
+                os << "-";
             }
-            if (k == 1) {
-                os << "X";
+            else {
+                os << " - ";
             }
+        }
+        else {
+            if (k < P.deg()) {
+                os << " + ";
+            }
+        }
+        if (coeff != K(1) || k == 0) {
+            os << coeff;
+        }
+        if (k == 1) {
+            os << "X";
+        }
+        if (k > 1) {
+            os << "X^" << k;
         }
     }
     return os;
@@ -354,7 +371,7 @@ Polynomial<K> operator/(J x, const Polynomial<K>& P) {
 
 // Helper procedure for division of polynomials
 template<class K>
-void quot_rem(const Polynomial<K>& A,
+static void quot_rem(const Polynomial<K>& A,
               const Polynomial<K>& B,
               Polynomial<K>& Q,
               Polynomial<K>& R) {
@@ -369,16 +386,21 @@ void quot_rem(const Polynomial<K>& A,
         BB.shift(k);
         K a_lead = AA[AA.deg()];
         K b_lead = BB[BB.deg()];
-        for (long j = 0; j <= BB.deg(); j++) {
-            BB.set(j, (BB[j]*a_lead) / b_lead);
+        double q = a_lead / b_lead;
+        for (long j = 0; j < BB.deg(); j++) {
+            BB.set(j, BB[j]*q);
         }
+        // Set leading coefficients to zero
+        AA.set(AA.deg(), K(0));
+        BB.set(BB.deg(), K(0));
+
         AA -= BB;
         Q.set(k, a_lead/b_lead);
     }
     R = A - Q*B;
 }
 
-// Returns gcd of two polynomials
+// Returns gcd (monic) of two polynomials
 template <class K>
 Polynomial<K> gcd(const Polynomial<K>& A, const Polynomial<K>& B) {
     if (B.isZero()) {
