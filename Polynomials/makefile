@@ -5,5 +5,5 @@ CXXFLAGS = -Wall
 problem: $(problem)
 	g++ $(problem) $(includes) -o exec; ./exec
 
-	rm -f *.o
 clean: 
+	rm -f *.o
