@@ -106,15 +106,24 @@ class quaternion {
             return *this;
         }
 
+        quaternion inverse() const {
+            // Check if that is zero quaternion
+            if (isZero()) {
+                std::cerr << "Warning: this quaternion is zero" << std::endl;
+                return quaternion();
+            }
+            double r = a*a + b*b + c*c + d*d;
+            return quaternion(a, -b, -c, -d)*(1./r);
+
+        }
+
         quaternion operator/(const quaternion& that) const {
             // Check if that is zero quaternion
             if (that.isZero()) {
                 std::cerr << "Warning: Divisor is zero" << std::endl;
                 return quaternion();
             }
-            double r = that.a*that.a + that.b*that.b
-                + that.c*that.c + that.d*that.d;
-            return *this*quaternion(that.a, -that.b, -that.c, -that.d)*(1./r);
+            return *this * that.inverse();
         }
 
         quaternion operator/=(const quaternion& that) {
